@@ -1,0 +1,416 @@
+<\!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>面会予約システム - 翌日専用</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .container {
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .date-card {
+            background: linear-gradient(135deg, #87CEEB 0%, #4682B4 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .date-card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .date-display {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .date-note {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .form-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        
+        input[type="text"], 
+        input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        input[type="text"]:focus, 
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #4682B4;
+            box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.1);
+        }
+        
+        .time-section {
+            margin-bottom: 20px;
+        }
+        
+        .time-section h3 {
+            background: linear-gradient(135deg, #4682B4, #87CEEB);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .time-slot {
+            padding: 12px 6px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .time-slot:hover {
+            border-color: #4682B4;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(70, 130, 180, 0.2);
+        }
+        
+        .time-slot.selected {
+            background: #4682B4;
+            color: white;
+            border-color: #4682B4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(70, 130, 180, 0.3);
+        }
+        
+        .time-slot.unavailable {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .time-slot.unavailable:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #4682B4, #87CEEB);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(70, 130, 180, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 480px) {
+            .time-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            
+            .time-slot {
+                padding: 10px 4px;
+                font-size: 13px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .date-display {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>面会予約システム</h1>
+    </div>
+    
+    <div class="container">
+        <div class="date-card">
+            <h2>📅 面会予定日</h2>
+            <div class="date-display" id="dateDisplay">読み込み中...</div>
+            <div class="date-note">※翌日の面会予約のみ受け付けています</div>
+        </div>
+        
+        <div class="form-card">
+            <form id="reservationForm">
+                <div class="form-group">
+                    <label for="userName">利用者名<span class="required">*</span></label>
+                    <input type="text" id="userName" name="userName" required placeholder="例：山田 太郎">
+                </div>
+                
+                <div class="form-group">
+                    <label for="visitorName">面会者名<span class="required">*</span></label>
+                    <input type="text" id="visitorName" name="visitorName" required placeholder="例：山田 花子">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">連絡先電話番号<span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" required placeholder="例：090-1234-5678">
+                </div>
+                
+                <div class="form-group">
+                    <label>面会時間<span class="required">*</span></label>
+                    
+                    <div class="time-section">
+                        <h3>🌅 午前</h3>
+                        <div class="time-grid" id="morningSlots"></div>
+                    </div>
+                    
+                    <div class="time-section">
+                        <h3>🌞 午後</h3>
+                        <div class="time-grid" id="afternoonSlots"></div>
+                    </div>
+                    
+                    <input type="hidden" id="selectedTime" name="selectedTime" required>
+                    <input type="hidden" id="reservationDate" name="reservationDate">
+                </div>
+                
+                <button type="submit" class="submit-btn">予約を申し込む</button>
+            </form>
+            
+            <div id="result"></div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 正確な翌日の日付計算
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        // 日付表示の更新
+        const dateDisplay = document.getElementById("dateDisplay");
+        const reservationDateInput = document.getElementById("reservationDate");
+        
+        const options = { 
+            year: "numeric", 
+            month: "long", 
+            day: "numeric", 
+            weekday: "long",
+            timeZone: "Asia/Tokyo"
+        };
+        
+        const formattedDate = tomorrow.toLocaleDateString("ja-JP", options);
+        const isoDate = tomorrow.toISOString().split("T")[0];
+        
+        dateDisplay.textContent = formattedDate;
+        reservationDateInput.value = isoDate;
+        
+        // 時間スロット生成
+        function createTimeSlot(hour, minute, containerId) {
+            const container = document.getElementById(containerId);
+            const timeString = String(hour).padStart(2, "0") + ":" + String(minute).padStart(2, "0");
+            
+            // 昼休み時間は利用不可
+            const isUnavailable = (hour === 12 && minute >= 0 && minute <= 45);
+            
+            const slot = document.createElement("div");
+            slot.className = "time-slot" + (isUnavailable ? " unavailable" : "");
+            slot.textContent = timeString;
+            slot.dataset.time = timeString;
+            
+            if (\!isUnavailable) {
+                slot.addEventListener("click", function() {
+                    document.querySelectorAll(".time-slot").forEach(s => s.classList.remove("selected"));
+                    this.classList.add("selected");
+                    document.getElementById("selectedTime").value = this.dataset.time;
+                });
+            }
+            
+            container.appendChild(slot);
+        }
+        
+        // 午前の時間スロット (9:00-11:45, 30分間隔)
+        const morningTimes = [
+            [9, 0], [9, 30], [10, 0], [10, 30], [11, 0], [11, 30]
+        ];
+        
+        morningTimes.forEach(([hour, minute]) => {
+            createTimeSlot(hour, minute, "morningSlots");
+        });
+        
+        // 午後の時間スロット (13:00-16:30, 30分間隔)
+        const afternoonTimes = [
+            [13, 0], [13, 30], [14, 0], [14, 30], [15, 0], [15, 30], [16, 0], [16, 30]
+        ];
+        
+        afternoonTimes.forEach(([hour, minute]) => {
+            createTimeSlot(hour, minute, "afternoonSlots");
+        });
+        
+        // フォーム送信処理
+        document.getElementById("reservationForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.querySelector(".submit-btn");
+            const result = document.getElementById("result");
+            
+            const userName = document.getElementById("userName").value.trim();
+            const visitorName = document.getElementById("visitorName").value.trim();
+            const phone = document.getElementById("phone").value.trim();
+            const selectedTime = document.getElementById("selectedTime").value;
+            
+            if (\!userName || \!visitorName || \!phone || \!selectedTime) {
+                result.innerHTML = "<div class=\"result error\">❌ すべての項目を入力してください</div>";
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = "送信中...";
+            
+            try {
+                // デモ用の送信処理
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                result.innerHTML = "<div class=\"result success\">✅ 予約が正常に申し込まれました<br><br><strong>予約内容</strong><br>利用者: " + userName + " 様<br>面会者: " + visitorName + " 様<br>日時: " + formattedDate + " " + selectedTime + "〜<br><br>確認のため後日ご連絡いたします。</div>";
+                
+                // フォームリセット
+                this.reset();
+                document.querySelectorAll(".time-slot").forEach(s => s.classList.remove("selected"));
+                document.getElementById("selectedTime").value = "";
+                
+            } catch (error) {
+                result.innerHTML = "<div class=\"result error\">❌ 予約の申し込みに失敗しました。しばらく時間をおいて再度お試しください。</div>";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "予約を申し込む";
+            }
+        });
+        
+        // デバッグ情報
+        console.log("水色背景日付固定版読み込み完了");
+        console.log("現在時刻:", now.toLocaleString("ja-JP"));
+        console.log("面会予定日:", formattedDate);
+    });
+    </script>
+</body>
+</html>
